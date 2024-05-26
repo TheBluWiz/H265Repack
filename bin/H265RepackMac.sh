@@ -4,7 +4,6 @@
 #                        theBluWIz                              #
 #                   Happy Transcoding!                          #
 #################################################################
-#!/bin/bash
 
 # Function to display usage information
 show_usage() {
@@ -24,7 +23,7 @@ Examples:
     H265Repack input.mp4 output.mkv mkv
   
   Custom Compression:
-    H265Repack input.mp4 output.mkv mkv medium 23
+    H265Repack input.mp4 output.mkv mkv 23 medium
 EOF
 }
 
@@ -64,16 +63,16 @@ convert_file() {
 
   # Map numerical preset to ffmpeg preset string
   case $preset in
-    1) ffmpeg_preset="ultrafast" ;;
-    2) ffmpeg_preset="superfast" ;;
-    3) ffmpeg_preset="veryfast" ;;
-    4) ffmpeg_preset="faster" ;;
-    5) ffmpeg_preset="fast" ;;
-    6) ffmpeg_preset="medium" ;;
-    7) ffmpeg_preset="slow" ;;
-    8) ffmpeg_preset="slower" ;;
-    9) ffmpeg_preset="veryslow" ;;
-    10) ffmpeg_preset="placebo" ;;
+    "ultrafast") ffmpeg_preset="ultrafast" ;;
+    "superfast") ffmpeg_preset="superfast" ;;
+    "veryfast") ffmpeg_preset="veryfast" ;;
+    "faster") ffmpeg_preset="faster" ;;
+    "fast") ffmpeg_preset="fast" ;;
+    "medium") ffmpeg_preset="medium" ;;
+    "slow") ffmpeg_preset="slow" ;;
+    "slower") ffmpeg_preset="slower" ;;
+    "veryslow") ffmpeg_preset="veryslow" ;;
+    "placebo") ffmpeg_preset="placebo" ;;
     *) ffmpeg_preset="medium" ;;  # Default to medium if not specified
   esac
 
@@ -92,6 +91,7 @@ convert_file() {
   esac
 
   # Prepare ffmpeg command with optional preset value and CRF value
+  # echo "ffmpeg -i \"$src_file\" -c:v hevc_videotoolbox -preset \"$ffmpeg_preset\" -crf \"$crf\" -color_range \"$color_range_flag\" -c:a copy \"$tgt_file\"" This line used for testing
   ffmpeg -i "$src_file" -c:v hevc_videotoolbox -preset "$ffmpeg_preset" -crf "$crf" -color_range "$color_range_flag" -c:a copy "$tgt_file"
 
   # Check if conversion was successful
@@ -170,7 +170,7 @@ SOURCE=$1
 TARGET=$2
 TARGET_EXT=$3
 CRF=${4:-28}  # Default to 28 if not specified
-PRESET=${5:-6}  # Default to 6 if not specified
+PRESET=${5:-"medium"}  # Default to medium if not specified
 
 # Convert CRF value if it's a word
 CRF=$(convert_crf "$CRF")
