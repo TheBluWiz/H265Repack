@@ -11,7 +11,7 @@ H265Repack
      format using hardware acceleration. It supports both individual 
      files and directories containing multiple video files. The script 
      allows the user to specify a CRF (Constant Rate Factor) value 
-     quality and a preset for the compression.
+     and a preset for the compression.
 
      The script uses ffmpeg for the conversion process and can handle a 
      variety of video formats. It also detects and retains the color 
@@ -32,9 +32,19 @@ H265Repack
          extensions include 'mp4', 'mkv', etc.
 
 .SH OPTIONAL ARGUMENTS
+     crf
+         The CRF (Constant Rate Factor) value for the conversion 
+         process. Valid values are 0 to 51, or quality 
+         descriptors:
+             Poor      - CRF 40
+             Fair      - CRF 30
+             Good      - CRF 23
+             Excellent - CRF 18
+             Superb    - CRF 15
+
      preset
-         The quality preset for the conversion process. Defaults to 6 
-         (medium) if not specified. Valid values are:
+         The quality preset for the conversion process. Valid values 
+         are:
              1 - ultrafast
              2 - superfast
              3 - veryfast
@@ -46,16 +56,6 @@ H265Repack
              9 - veryslow
             10 - placebo
 
-     crf
-         The CRF (Constant Rate Factor) value for the conversion 
-         process. Defaults to 28 if not specified. Valid values 
-         are 0 to 51, or quality descriptors:
-             Poor      - CRF 40
-             Fair      - CRF 30
-             Good      - CRF 23
-             Excellent - CRF 18
-             Superb    - CRF 15
-
 .SH USAGE
      To convert a single file:
          H265Repack source_file.mp4 target_file_name mkv 5 Good
@@ -64,16 +64,16 @@ H265Repack
          H265Repack /path/to/source_dir /path/to/target_dir mkv 5 Good
 
 .SH EXAMPLES
-     Convert a single file with CRF 23 and medium preset:
-         H265Repack input.mp4 output mkv 23 6
+     Convert a single file using default settings:
+         H265Repack input.mp4 output mkv
 
      Convert all files in a directory with CRF 30 and medium preset:
-         H265Repack /videos/source /videos/target mp4 fair medium
+         H265Repack /videos/source /videos/target mp4 fair 5
 
 .SH FILES
      The script searches for video files with the following extensions: 
-     avi, mp4, mkv, mov, flv, wmv, mpg, mpeg, webm, ogv, ts, 3gp, asf, 
-     m2ts, vob, rm.
+     .3gp, .asf, .avi, .flv, .m2ts, .mkv, .mov, .mp4, .mpeg, .mpg, .ogv,
+     .rm, .ts, .vob, .webm, .wmv
 
 .SH TROUBLESHOOTING
      If the conversion process fails, ensure that the source file 
