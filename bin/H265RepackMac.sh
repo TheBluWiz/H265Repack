@@ -1,29 +1,30 @@
 #!/bin/bash
 #################################################################
 #              This Script Brought to you by                    #
-#                        theBluWIz                              #
+#                        theBluWiz                              #
 #                   Happy Transcoding!                          #
 #################################################################
 
 # Function to display usage information
 show_usage() {
   cat <<EOF
-Usage: H265Repack <source> <target> <containerFormat> [crf] [preset-Compression]
+Usage: H265Repack <source> <target> <containerFormat> [crf] [compression lvl]
 
 Arguments:
   <source>           Path to source video file(s).
   <target>           Path to save the converted video file(s).
   <containerFormat>  Desired output container format (e.g., mp4, mkv).
-  [crf]              Optional. Constant Rate Factor for controlling the output quality (e.g., 18, 23).
-  [preset-Compression]  Optional. Preset for compression (e.g., fast, medium, slow).
-
+  [crf]              Optional. Constant Rate Factor for controlling the
+                     output quality (e.g., poor, good, superb or 0-51).
+  [compression lvl]  Optional. Preset for compression (e.g., fast, medium,
+                     slow or 0-9).
 
 Examples:
   Basic Conversion:
-    H265Repack input.mp4 output.mkv mkv
+    H265Repack input.mp4 output mkv
   
   Custom Compression:
-    H265Repack input.mp4 output.mkv mkv 23 medium
+    H265Repack input.mp4 output mkv 23 medium
 EOF
 }
 
@@ -46,9 +47,27 @@ convert_crf() {
       if [[ $crf_value =~ ^[0-9]+$ ]] && [ "$crf_value" -ge 0 ] && [ "$crf_value" -le 51 ]; then
         echo $crf_value
       else
-        echo 28  # Default CRF value
+        echo ""  # Return empty string if CRF value is invalid
       fi
       ;;
+  esac
+}
+
+# Function to convert preset value to ffmpeg preset string
+convert_preset() {
+  local preset_value=$1
+  case $preset_value in
+    0 | "ultrafast") echo "ultrafast" ;;
+    1 | "superfast") echo "superfast" ;;
+    2 | "veryfast") echo "veryfast" ;;
+    3 | "faster") echo "faster" ;;
+    4 | "fast") echo "fast" ;;
+    5 | "medium") echo "medium" ;;
+    6 | "slow") echo "slow" ;;
+    7 | "slower") echo "slower" ;;
+    8 | "veryslow") echo "veryslow" ;;
+    9 | "placebo") echo "placebo" ;;
+    *) echo "" ;;  # Default to nothing if not specified
   esac
 }
 
@@ -60,21 +79,6 @@ convert_file() {
   local preset=$4
 
   echo "Converting $src_file to $tgt_file"
-
-  # Map numerical preset to ffmpeg preset string
-  case $preset in
-    "ultrafast") ffmpeg_preset="ultrafast" ;;
-    "superfast") ffmpeg_preset="superfast" ;;
-    "veryfast") ffmpeg_preset="veryfast" ;;
-    "faster") ffmpeg_preset="faster" ;;
-    "fast") ffmpeg_preset="fast" ;;
-    "medium") ffmpeg_preset="medium" ;;
-    "slow") ffmpeg_preset="slow" ;;
-    "slower") ffmpeg_preset="slower" ;;
-    "veryslow") ffmpeg_preset="veryslow" ;;
-    "placebo") ffmpeg_preset="placebo" ;;
-    *) ffmpeg_preset="medium" ;;  # Default to medium if not specified
-  esac
 
   # Extract color range using ffprobe
   local color_range=$(ffprobe -v error -select_streams v:0 -show_entries stream=color_range -of default=noprint_wrappers=1:nokey=1 "$src_file")
@@ -90,9 +94,19 @@ convert_file() {
     *) color_range_flag="full" ;;
   esac
 
-  # Prepare ffmpeg command with optional preset value and CRF value
-  # echo "ffmpeg -i \"$src_file\" -c:v hevc_videotoolbox -preset \"$ffmpeg_preset\" -crf \"$crf\" -color_range \"$color_range_flag\" -c:a copy \"$tgt_file\"" This line used for testing
-  ffmpeg -i "$src_file" -c:v hevc_videotoolbox -preset "$ffmpeg_preset" -crf "$crf" -color_range "$color_range_flag" -c:a copy "$tgt_file"
+  # Convert preset value if provided
+  if [ -n "$preset" ]; then
+    preset=$(convert_preset "$preset")
+  fi
+
+  # Check if optional values are provided
+  if [ -z "$crf" ] && [ -z "$preset" ]; then
+    # No CRF or preset, use hevc_videotoolbox without -preset or -crf
+    ffmpeg -i "$src_file" -c:v hevc_videotoolbox -color_range $color_range_flag -c:a copy "$tgt_file"
+  else
+    # Use libx265 with optional CRF and preset
+    ffmpeg -i "$src_file" -c:v libx265 ${preset:+-preset $preset} ${crf:+-crf $crf} -color_range $color_range_flag -c:a copy "$tgt_file"
+  fi
 
   # Check if conversion was successful
   if [ $? -eq 0 ]; then
@@ -155,13 +169,14 @@ process_files() {
 
   export -f convert_file
   export -f process_file_batch
+  export -f convert_preset
 
   find_video_files "$source_dir" | xargs -0 -n 1 -P 4 -I {} bash -c 'process_file_batch "$@"' _ {} "$source_dir" "$target_dir" "$target_ext" "$crf" "$preset"
 }
 
 # Check for minimum arguments
 if [ "$#" -lt 3 ]; then
-  echo "Usage: $0 <Source File or Directory> <Target File or Directory> <Target extension> [CRF value (0-51 or quality word)] [preset (1-10)]"
+  echo "Usage: $0 <Source File or Directory> <Target File or Directory> <Target extension> [CRF value (0-51 or quality word)] [preset (0-9 or preset name)]"
   exit 1
 fi
 
@@ -169,11 +184,13 @@ fi
 SOURCE=$1
 TARGET=$2
 TARGET_EXT=$3
-CRF=${4:-28}  # Default to 28 if not specified
-PRESET=${5:-"medium"}  # Default to medium if not specified
+CRF=$4
+PRESET=$5
 
 # Convert CRF value if it's a word
-CRF=$(convert_crf "$CRF")
+if [ -n "$CRF" ]; then
+  CRF=$(convert_crf "$CRF")
+fi
 
 # Debugging output
 echo "Source: $SOURCE"
@@ -200,6 +217,6 @@ else
 fi
 #################################################################
 #              This Script Brought to you by                    #
-#                        theBluWIz                              #
+#                        theBluWiz                              #
 #                   Happy Transcoding!                          #
 #################################################################
