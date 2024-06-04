@@ -1,0 +1,21 @@
+{
+  "name": "H265Repack",
+  "version": "1.0.0",
+  "description": "easily repack videos to HEVC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheBluWiz/H265Repack.git"
+  },
+  "keywords": [
+    "H.265",
+    "video",
+    "repack",
+    "compression"
+  ],
+  "author": "Jamey Wicklund/theBluWiz",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/TheBluWiz/H265Repack/issues"
+  },
+  "homepage": "https://github.com/TheBluWiz/H265Repack#readme"
+}
