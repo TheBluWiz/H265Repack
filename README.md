@@ -1,4 +1,4 @@
-# H265Repack [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) ![Author](https://img.shields.io/github/package-json/author/TheBluWiz/H265Repack?logoColor=navy) ![Version](https://img.shields.io/github/package-json/v/TheBluWiz/H265Repack?color=sucess)
+# H265Repack [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Author](https://img.shields.io/github/package-json/author/TheBluWiz/H265Repack?)](https://github.com/TheBluWiz) ![Version](https://img.shields.io/github/package-json/v/TheBluWiz/H265Repack?color=sucess)
 
 ## Description
 **H265Repack** is an easy-to-use CLI video converter tool designed to repack single videos or video directories into the H.265 format, ensuring high efficiency and quality. On macOS, it leverages hardware-level H.265 encoding supported by macOS devices for optimal performance. On Linux, the script doesn't assume hardware configuration. Feel free to alter the script to support your device specifically.
