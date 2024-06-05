@@ -35,6 +35,8 @@ cp /tmp/H265Repack-$folder_name/bin/H265RepackMac.sh ~/.bin/H265Repack || { echo
 chmod +x ~/.bin/H265Repack || { echo "Failed to make the script executable"; exit 1; }
 
 # Install man page
+echo ""; echo "";
+echo "Super user password is required to install man(1) page."
 sudo mkdir -p /usr/local/share/man/man1 || { echo "Failed to create man directory"; exit 1; }
 sudo cp /tmp/H265Repack-$folder_name/man/H265Repack.1 /usr/local/share/man/man1/H265Repack.1 || { echo "Failed to copy the man page"; exit 1; }
 sudo gzip /usr/local/share/man/man1/H265Repack.1 || { echo "Failed to gzip the man page"; exit 1; }
@@ -45,20 +47,13 @@ echo "Man page installed and database updated successfully."
 rm -rf /tmp/H265Repack.zip /tmp/H265Repack-$folder_name || { echo "Failed to clean up temporary files"; exit 1; }
 
 # Add ~/.bin to PATH in .bashrc or .zshrc if not already present
-if [[ $SHELL == *"bash"* ]]; then
-  if ! grep -qxF 'export PATH="$HOME/.bin:$PATH"' ~/.bashrc; then
-    echo 'export PATH="$HOME/.bin:$PATH"' >>~/.bashrc
-  fi
-elif [[ $SHELL == *"zsh"* ]]; then
-  if ! grep -qxF 'export PATH="$HOME/.bin:$PATH"' ~/.zshrc; then
-    echo 'export PATH="$HOME/.bin:$PATH"' >>~/.zshrc
-  fi
-else
-  echo "Unsupported shell: $SHELL"
-  exit 1
+if ! grep -qxF 'export PATH="$HOME/.bin:$PATH"' ~/.bashrc; then
+  echo 'export PATH="$HOME/.bin:$PATH"' >>~/.bashrc
 fi
 
-
+if ! grep -qxF 'export PATH="$HOME/.bin:$PATH"' ~/.zshrc; then
+  echo 'export PATH="$HOME/.bin:$PATH"' >>~/.zshrc
+fi
 
 # Prompt to remove the installer file
 read -p "Do you want to remove the installer file? [y/n]: " remove
