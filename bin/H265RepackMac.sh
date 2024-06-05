@@ -41,6 +41,16 @@ fi
 if [ "$1" == "--update" ]; then
   echo "Checking for updates"
   latest_version=$(curl -s https://api.github.com/repos/TheBluWiz/H265Repack/tags | jq -r '.[0].name')
+
+  # Update homebrew
+  brew update;
+
+  # Check if ffmpeg is updated
+  brew outdated ffmpeg || brew upgrade ffmpeg;
+
+  # Check if jq is updated
+  brew outdated jq || brew upgrade jq;
+
   if [ "$installed_version" == "$latest_version" ]; then
     echo "You are already using the latest version: $installed_version"
   else
