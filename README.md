@@ -11,6 +11,7 @@
 - [Usage](#usage)
 - [Updates](#updates)
 - [Contributing](#contributing)
+- [Going Forward](#going-forward)
 - [Questions](#questions)
 - [Author](#author)
 - [License](#license)
