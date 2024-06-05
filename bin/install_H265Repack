@@ -1,29 +1,48 @@
 #!/bin/bash
-current_version="1.0.0"
 
-# Notify the user that sudo might be needed
-echo "This script will require sudo permissions. Please ensure you have the necessary rights."
+# Install Homebrew if not installed
+if ! command -v brew &>/dev/null; then
+  echo "Homebrew not found. Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || { echo "Failed to install Homebrew"; exit 1; }
+  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >>~/.zprofile
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+# Install ffmpeg if not installed
+if ! command -v ffmpeg &>/dev/null; then
+  echo "ffmpeg not found. Installing ffmpeg..."
+  brew install ffmpeg || { echo "Failed to install ffmpeg"; exit 1; }
+fi
+
+# Install jq if not installed
+if ! command -v jq &>/dev/null; then
+  echo "jq not found. Installing jq..."
+  brew install jq || { echo "Failed to install jq"; exit 1; }
+fi
 
 # Ensure ~/.bin directory exists
 mkdir -p ~/.bin || { echo "Failed to create ~/.bin directory"; exit 1; }
 
+# Get the latest release version
+latest_version=$(curl -s https://api.github.com/repos/TheBluWiz/H265Repack/tags | jq -r '.[0].name')
 # Download and unzip the script
-curl -L -o /tmp/H265Repack.zip "https://github.com/TheBluWiz/H265Repack/archive/refs/tags/v$current_version.zip" || { echo "Failed to download the script"; exit 1; }
+curl -L -o /tmp/H265Repack.zip "https://github.com/TheBluWiz/H265Repack/archive/refs/tags/$latest_version.zip" || { echo "Failed to download the script"; exit 1; }
 unzip /tmp/H265Repack.zip -d /tmp || { echo "Failed to unzip the script"; exit 1; }
 
 # Copy the script to ~/.bin and make it executable
-cp /tmp/H265Repack-$current_version/bin/H265RepackMac.sh ~/.bin/H265Repack || { echo "Failed to copy the script to ~/.bin"; exit 1; }
+folder_name=${latest_version:1}
+cp /tmp/H265Repack-$folder_name/bin/H265RepackMac.sh ~/.bin/H265Repack || { echo "Failed to copy the script to ~/.bin"; exit 1; }
 chmod +x ~/.bin/H265Repack || { echo "Failed to make the script executable"; exit 1; }
 
 # Install man page
 sudo mkdir -p /usr/local/share/man/man1 || { echo "Failed to create man directory"; exit 1; }
-sudo cp /tmp/H265Repack-$current_version/man/H265Repack.1 /usr/local/share/man/man1/H265Repack.1 || { echo "Failed to copy the man page"; exit 1; }
+sudo cp /tmp/H265Repack-$folder_name/man/H265Repack.1 /usr/local/share/man/man1/H265Repack.1 || { echo "Failed to copy the man page"; exit 1; }
 sudo gzip /usr/local/share/man/man1/H265Repack.1 || { echo "Failed to gzip the man page"; exit 1; }
 sudo /usr/libexec/makewhatis /usr/local/share/man/man1 || { echo "Failed to update man database"; exit 1; }
 echo "Man page installed and database updated successfully."
 
 # Clean up temporary files
-rm -rf /tmp/H265Repack.zip /tmp/H265Repack-$current_version || { echo "Failed to clean up temporary files"; exit 1; }
+rm -rf /tmp/H265Repack.zip /tmp/H265Repack-$folder_name || { echo "Failed to clean up temporary files"; exit 1; }
 
 # Add ~/.bin to PATH in .bashrc or .zshrc if not already present
 if [[ $SHELL == *"bash"* ]]; then
@@ -39,19 +58,7 @@ else
   exit 1
 fi
 
-# Install Homebrew if not installed
-if ! command -v brew &>/dev/null; then
-  echo "Homebrew not found. Installing Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || { echo "Failed to install Homebrew"; exit 1; }
-  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >>~/.zprofile
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
 
-# Install ffmpeg if not installed
-if ! command -v ffmpeg &>/dev/null; then
-  echo "ffmpeg not found. Installing ffmpeg..."
-  brew install ffmpeg || { echo "Failed to install ffmpeg"; exit 1; }
-fi
 
 # Prompt to remove the installer file
 read -p "Do you want to remove the installer file? [y/n]: " remove

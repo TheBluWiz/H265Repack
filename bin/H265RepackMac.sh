@@ -5,6 +5,9 @@
 #                   Happy Transcoding!                          #
 #################################################################
 
+# Current Version: 1.1.0
+# Release Date: 2024-06-04
+installed_version="v1.1.0"
 # Function to display usage information
 show_usage() {
   cat <<EOF
@@ -32,6 +35,31 @@ EOF
 if [ "$#" -eq 0 ] || [ "$1" == "--help" ]; then
   show_usage
   exit 0
+fi
+
+# Check if the first argument is --update
+if [ "$1" == "--update" ]; then
+  echo "Checking for updates"
+  latest_version=$(curl -s https://api.github.com/repos/TheBluWiz/H265Repack/tags | jq -r '.[0].name')
+  if [ "$installed_version" == "$latest_version" ]; then
+    echo "You are already using the latest version: $installed_version"
+  else
+    echo "$latest_version is available\nUpdating..."
+
+    # Download and unzip the script
+    curl -L -o /tmp/H265Repack.zip "https://github.com/TheBluWiz/H265Repack/archive/refs/tags/$latest_version.zip" || { echo "Failed to download the script"; exit 1; }
+    unzip /tmp/H265Repack.zip -d /tmp || { echo "Failed to unzip the script"; exit 1; }
+
+    # Copy the script to ~/.bin and make it executable
+    latest_version=${latest_version:1}
+    cp "/tmp/H265Repack-$latest_version/bin/H265RepackMac.sh" ~/.bin/H265Repack || { echo "Failed to copy the script to ~/.bin"; exit 1; }
+    chmod +x ~/.bin/H265Repack || { echo "Failed to make the script executable"; exit 1; }
+
+    # Clean up
+    rm -rf /tmp/H265Repack.zip /tmp/H265Repack-$latest_version || { echo "Failed to clean up"; exit 1; }
+    echo "Update successful. Happy Transcoding!."
+  exit 0
+  fi
 fi
 
 # Function to convert CRF quality words to numeric values
