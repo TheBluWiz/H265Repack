@@ -9,6 +9,7 @@
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Updates](#updates)
 - [Contributing](#contributing)
 - [Questions](#questions)
 - [Author](#author)
@@ -48,8 +49,8 @@ H265Repack <source> <target> <containerFormat> [crf] [preset-Compression]
 - `<source>`: Path to source video file(s).
 - `<target>`: Path to save the converted video file(s).
 - `<containerFormat>`: Desired output container format (e.g., mp4, mkv).
-- `[crf]`: Optional. Constant Rate Factor for controlling the output quality (e.g., 18, 23)
-- `[-preset]`: Optional. Preset for compression (e.g., fast, medium, slow).
+- `[crf]`: Optional. Constant Rate Factor for controlling the output quality (e.g., poor, good, superb or 0-51)
+- `[-preset]`: Optional. Preset for compression (e.g., fast, medium, slow or 0-9).
 ### Examples
 #### Basic Conversion
 ```sh
@@ -60,13 +61,22 @@ H265Repack input.mp4 output mkv
 H265Repack /videos/source /videos/target mp4 fair 5
 ```
 It is worth noting that hardware acceleration on macOS is only available when not using optional arguments. The hardware acceleration circutry is opinionated and doesn't allow for those optional customizations. 
+## Updates
+It is easy to get the latest codec libraries and encoding logic. Simply type:
+```
+H265Repack --update
+```
+These will update if newer versions are available:
+- Homebrew
+- ffmpeg
+- jq
+- H265Repack
 ## Contributing
 Contributions are welcome! If you have suggestions for improvements or have found bugs, please email me at <a href="mailto:thebluwiz@icloud.com?subject=H265Repack">thebluwiz@icloud.com</a>. For major changes, please open an issue first to discuss what you would like to change.
 ## Going Forward
 - Suppress ffmpeg ouput
 - Potentially add a progress bar or other animation during transcode
 - May add in additional scripts for `AV1` Titles.
-- include `update` instructions
 - Add Support for Windows
 ## Acknowledgements
 - Special callout to the developers at ffmpeg and all the libraries and tools that made this project possible.
