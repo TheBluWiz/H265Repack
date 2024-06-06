@@ -61,9 +61,17 @@ if [ "$1" == "--update" ]; then
     unzip /tmp/H265Repack.zip -d /tmp || { echo "Failed to unzip the script"; exit 1; }
 
     # Copy the script to ~/.bin and make it executable
-    latest_version=${latest_version:1}
-    cp "/tmp/H265Repack-$latest_version/bin/H265RepackMac.sh" ~/.bin/H265Repack || { echo "Failed to copy the script to ~/.bin"; exit 1; }
+    folder_name=${latest_version:1}
+    cp "/tmp/H265Repack-$folder_name/bin/H265RepackMac.sh" ~/.bin/H265Repack || { echo "Failed to copy the script to ~/.bin"; exit 1; }
     chmod +x ~/.bin/H265Repack || { echo "Failed to make the script executable"; exit 1; }
+
+    # Update man page
+    echo ""; echo "";
+    echo "Super user password is required to install man(1) page."
+    sudo cp /tmp/H265Repack-$folder_name/man/H265Repack.1 /usr/local/share/man/man1/H265Repack.1 || { echo "Failed to copy the man page"; exit 1; }
+    sudo gzip /usr/local/share/man/man1/H265Repack.1 || { echo "Failed to gzip the man page"; exit 1; }
+    sudo /usr/libexec/makewhatis /usr/local/share/man/man1 || { echo "Failed to update man database"; exit 1; }
+    
 
     # Clean up
     rm -rf /tmp/H265Repack.zip /tmp/H265Repack-$latest_version || { echo "Failed to clean up"; exit 1; }
